@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Sippy — Onlayn buyurtma</title>
+<style>
+  :root{
+    /* WEB APP – синий + белый */
+    --accent1: #0A58FF;        /* основной синий (логотип) */
+    --accent2: #ffffff;
+    --accent-2alt: #2f7bff;
+    --accent-soft: #EAF1FF;
+    --bg-gradient-start: #f5f8ff;
+    --bg-gradient-end: #ffffff;
+    --card-bg: #ffffff;
+    --muted: #64748b;
+    --input-bg: #f8fbff;
+    --input-border: #c7d6ff;
+    --radius:16px;
+    --text:#0f172a;
+    --gap:12px;
+    --touch-min:48px;
+    --glass: rgba(15,23,42,0.03);
+  }
+
+  html,body{height:100%;margin:0}
+  body{
+    background: linear-gradient(180deg,var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    display:flex;align-items:flex-start;justify-content:center;min-height:100vh;
+    padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom);color:var(--text);
+  }
+
+  /* Card (app-like) */
+  .card{
+    width:920px;max-width:920px;margin:22px auto;
+    background: var(--card-bg);
+    border-radius:22px;
+    box-shadow:
+      0 20px 60px rgba(15,23,42,0.08),
+      0 2px 8px rgba(15,23,42,0.04);
+    padding:22px;border: none;position:relative;overflow:hidden;transition: transform .15s ease;
+    display:flex;gap:18px;
+  }
+
+  .left { width:220px; min-width:180px; display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:6px; }
+  .right { flex:1 }
+
+  /* Logo block — clean, bright */
+  .logo-square{
+    width:118px;height:118px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background: linear-gradient(135deg,var(--accent1), var(--accent-2alt));
+    box-shadow:
+      0 12px 32px rgba(10,88,255,0.22),
+      inset 0 1px 0 rgba(255,255,255,0.28);
+    overflow:hidden; position:relative;
+  }
+  .logo-square img{
+    max-width:100%; max-height:100%; object-fit:cover; display:block; border-radius:12px;
+    background: #fff; padding:6px;
+  }
+  .logo-badges { display:flex; gap:8px; margin-top:10px; }
+  .logo-badges img { width:36px; height:36px; border-radius:8px; object-fit:cover; box-shadow: 0 6px 18px rgba(15,23,42,0.06); border:1px solid rgba(255,255,255,0.6); }
+
+  h2{margin:6px 0 0 0;font-size:20px;font-weight:800;color:var(--text);text-align:center;letter-spacing:0.2px}
+  .subtitle{font-size:13px;color:var(--muted);margin-top:4px;text-align:center}
+
+  /* language switch */
+  .lang-row{position:absolute;right:12px;top:12px;display:flex;gap:8px;z-index:10}
+  .lang-btn{
+    background:transparent;border:1px solid rgba(15,23,42,0.06);color:var(--muted);
+    padding:8px 10px;border-radius:10px;font-weight:700;cursor:pointer;font-size:12px;transition:all .12s ease;
+    backdrop-filter: blur(4px);
+  }
+  .lang-btn.active{
+    background: linear-gradient(90deg,var(--accent1), var(--accent-2alt));
+    color: #fff; border: none; box-shadow: 0 10px 28px rgba(10,88,255,0.18);
+  }
+
+  /* Labels & inputs — web-app clean */
+  label{display:block;font-weight:700;margin-top:12px;font-size:14px;color:var(--text)}
+  input[type="text"], input[type="tel"], input[type="number"], select, textarea, input[type="file"], input[type="time"], input[type="date"]{
+    width:100%; padding:12px; border-radius:12px; border:1.5px solid var(--input-border);
+    font-size:15px; background:var(--input-bg); color:var(--text); box-sizing:border-box; margin-top:8px;
+    outline:none; min-height:var(--touch-min); transition: box-shadow .15s ease, transform .08s ease;
+  }
+  input:focus, textarea:focus, select:focus{
+    border-color: var(--accent1);
+    box-shadow: 0 0 0 6px rgba(10,88,255,0.12);
+    transform: none;
+  }
+  textarea{min-height:110px;resize:vertical;padding-top:10px}
+  .row{display:flex;gap:12px}
+  .small{width:50%}
+  .note{font-size:13px;color:var(--muted);margin-top:10px}
+
+  .items { margin-top:8px; display:flex;flex-direction:column; gap:8px; }
+  .item-row{display:flex;gap:8px;align-items:center}
+  .item-row select, .item-row input[type="number"]{ flex:1; }
+  .item-row button{ padding:10px 12px;border-radius:10px;border:none;background:#f1f5ff;color:var(--text); cursor:pointer; box-shadow: 0 6px 18px rgba(15,23,42,0.04); }
+
+  /* Buttons — modern app look */
+  .buttons{display:flex;gap:10px;margin-top:16px}
+  .btn{
+    flex:1;padding:14px;border-radius:14px;border:none;cursor:pointer;font-weight:800;
+    background: linear-gradient(135deg,var(--accent1), var(--accent-2alt));
+    color:#fff;font-size:16px;box-shadow: 0 12px 30px rgba(10,88,255,0.22);
+    transition: transform .12s ease, box-shadow .12s ease; min-height:var(--touch-min);
+  }
+  .btn:active{ transform: translateY(1px); box-shadow: 0 6px 18px rgba(10,88,255,0.18); }
+  .btn:disabled{ opacity:.6; cursor:default; transform:none; box-shadow:none; }
+
+  .status{margin-top:12px;font-size:14px;color:var(--muted);min-height:22px;word-break:break-word}
+  .meta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+  .meta-row > *{ flex:1; min-width:150px; }
+  .small-33{ width:33%; min-width:120px; }
+
+  /* menu panel — minimal */
+  .menu-panel {
+    background: #f9fbff; border-radius:14px; padding:12px; border:1px solid #e7f0ff;
+    box-shadow: 0 6px 20px rgba(15,23,42,0.03); margin-bottom:12px;
+  }
+  .menu-panel h3 { margin:0 0 8px 0; font-size:16px; color:var(--text); }
+  .menu-list { display:flex; flex-direction:column; gap:8px; }
+  .menu-item { display:flex; align-items:center; gap:10px; padding:8px 6px; border-bottom:1px solid #eef6ff; }
+  .menu-item:last-child{ border-bottom: none; }
+  .menu-item .mname { flex:1; font-weight:700; color:var(--text); }
+  .menu-item .mprice { width:130px; text-align:right; font-weight:800; }
+  .menu-item input.priceInput { width:130px; padding:8px; border-radius:10px; border:1px solid var(--input-border); background:var(--input-bg); text-align:right; }
+
+  /* Responsive adjustments */
+  @media (max-width:820px) {
+    body{padding:12px}
+    .card{width:100%;max-width:100%;margin:12px 0;flex-direction:column;gap:10px;padding:16px;border-radius:14px}
+    .left{width:100%;flex-direction:row;justify-content:flex-start;gap:14px;padding:6px 2px 0 2px}
+    .logo-square{width:86px;height:86px}
+    h2{font-size:18px;text-align:left}
+    .subtitle{text-align:left;font-size:13px}
+    .form{Padding-top:0}
+    .row{flex-direction:column}
+    .small{width:100%}
+    .preview{max-height:140px}
+    .lang-row{top:10px;right:8px}
+    .buttons{display:none}
+    #mobileSendBtn { display:block; position:fixed; left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); z-index:1200; }
+    input[type="text"], textarea, select { font-size:16px; padding:14px; min-height:52px; }
+    .age-row{flex-direction:row}
+  }
+  @media (max-width:420px){
+    :root{--gap:10px}
+    .logo-square{width:76px;height:76px}
+    .card{padding:12px}
+    input[type="text"], textarea, select { font-size:15px; padding:12px; min-height:50px; }
+    #mobileSendBtn{ left:10px; right:10px; bottom:10px }
+  }
+</style>
+</head>
+<body>
+  <div class="card" role="main" aria-labelledby="brand-title">
+    <div class="lang-row" aria-hidden="false">
+      <button class="lang-btn" id="btn-ru" aria-label="Русский">RU</button>
+      <button class="lang-btn active" id="btn-uz" aria-label="O'zbek">UZ</button>
+      <button class="lang-btn" id="btn-en" aria-label="English">EN</button>
+    </div>
+
+    <div class="left" aria-hidden="false">
+      <div class="logo-square" aria-hidden="true" title="Sippe">
+        <!-- главный логотип (заменён на вашу ссылку) -->
+        <a href="https://storage.yandexcloud.net/fotora.ru/4ce64e3562f8b3e6.jpeg" target="_blank" rel="noopener noreferrer">
+          <img src="https://storage.yandexcloud.net/fotora.ru/4ce64e3562f8b3e6.jpeg" alt="Sippe logo">
+        </a>
+        <!-- небольшие бейджи/иконки рядом с логотипом -->
+      </div>
+
+      <div class="logo-badges" aria-hidden="true">
+        <a href="https://storage.yandexcloud.net/fotora.ru/c91620e367c94c56.png" target="_blank" rel="noopener noreferrer">
+          <img src="https://storage.yandexcloud.net/fotora.ru/c91620e367c94c56.png" alt="badge1">
+        </a>
+        <a href="https://storage.yandexcloud.net/fotora.ru/063959e183f551a3.png" target="_blank" rel="noopener noreferrer">
+          <img src="https://storage.yandexcloud.net/fotora.ru/063959e183f551a3.png" alt="badge2">
+        </a>
+      </div>
+
+      <div style="flex:1;">
+        <h2 id="brand-title">Sippe</h2>
+        <div class="subtitle" id="brand-sub">Kofe uyi</div>
+      </div>
+    </div>
+
+    <div class="right">
+      <!-- MENU PANEL -->
+      <div class="menu-panel" id="menuPanel" aria-live="polite">
+        <h3 id="menuTitle">Menu</h3>
+        <div class="menu-list" id="menuList">
+          <!-- динамически заполняется -->
+        </div>
+      </div>
+
+      <form class="form" id="mainForm" onsubmit="event.preventDefault(); sendOrder();" aria-describedby="note-required">
+        <!-- Order lines -->
+        <label id="label-items">Buyurtma (tanlang mahsulot va miqdor)</label>
+        <div class="items" id="itemsContainer" aria-live="polite">
+          <!-- JS will populate one item row -->
+        </div>
+        <div style="margin-top:6px;">
+          <button type="button" class="btn" id="addItemBtn" style="background:transparent;color:var(--text);box-shadow:none;padding:8px 10px;border:1px dashed rgba(17,24,39,0.06);font-weight:700;">+ Qo'shish / Add item</button>
+        </div>
+
+        <div class="meta-row">
+          <div>
+            <label id="label-pickup" for="deliveryType">Yetkazib berish</label>
+            <select id="deliveryType" name="deliveryType">
+              <option value="собой">Olib ketish / собой</option>
+              <option value="delivery"> Яндекс / Delivery</option>
+            </select>
+          </div>
+          <div>
+            <label id="label-time" for="time">Vaqt (istalgan)</label>
+            <input id="time" name="time" type="time" />
+          </div>
+          <div>
+            <label id="label-date" for="date">Sana</label>
+            <input id="date" name="date" type="date" />
+          </div>
+        </div>
+
+        <label id="label-address" for="address">Manzil (agar yetkazilsa)</label>
+        <input id="address" name="address" type="text" placeholder="Ko'cha, uy, kv." />
+
+        <div class="row">
+          <div class="small">
+            <label id="label-payment" for="payment">To'lov</label>
+            <select id="payment" name="payment">
+              <option value="cash">Naqd / Cash</option>
+              <option value="card">Karta (pay on delivery)</option>
+              <option value="online">Online to'lov</option>
+            </select>
+          </div>
+          <div class="small">
+            <label id="label-name" for="customerName">Ism</label>
+            <input id="customerName" name="customerName" type="text" placeholder="Ismingiz / Your name" />
+          </div>
+        </div>
+
+        <label id="label-phone" for="phone">Telefon *</label>
+        <input id="phone" name="phone" type="tel" placeholder="+998..." required inputmode="tel" />
+
+        <label id="label-note" for="note">Qo'shimcha buyurtma</label>
+        <textarea id="note" name="note" placeholder="Masalan: kam shakar, sut yo'q, va hokazo"></textarea>
+
+        <div class="note" id="note-required">Yulduzcha (*) bilan belgilangan maydonlar majburiy.</div>
+
+        <div class="buttons">
+          <button class="btn" id="sendBtnDesktop" type="button" onclick="sendOrder()">📨 Buyurtma yuborish</button>
+        </div>
+
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+
+  <button id="mobileSendBtn" class="btn" style="display:none" aria-hidden="true" onclick="sendOrder()">📨 Buyurtma yuborish</button>
+
+<script>
+/* --- keep your bot token/chat id as before --- */
+const botToken = "8300065046:AAGlnmSZOq5y325_EXtshcVBJ8itkCEz0nI";
+const chatId = "-1003679635799";
+
+/* Translations + menu items */
+const translations = {
+  ru: {
+    brandTitle: "Sippe",
+    brandSub: "Кофейня",
+    labels: {
+      items: "Заказ (выберите продукт и количество)",
+      pickup: "Доставка",
+      time: "Время",
+      date: "Дата",
+      address: "Адрес (для доставки)",
+      payment: "Оплата",
+      name: "Имя",
+      phone: "Телефон *",
+      note: "Доп. заметки",
+      sendBtn: "📨 Отправить заказ",
+      sending: "Отправка...",
+      requiredMsg: "Пожалуйста, заполните обязательные поля (телефон и хотя бы один товар).",
+      ok_text: "✅ Заказ отправлен.",
+      error_send: "Ошибка отправки: ",
+      menuTitle: "Меню",
+      priceLabel: "Цена"
+    },
+    menu: [
+      { id: "espresso", name: "Эспрессо" },
+      { id: "americano", name: "Американо" },
+      { id: "latte", name: "Латте" },
+      { id: "cappuccino", name: "Капучино" },
+      { id: "flatwhite", name: "Флет уайт" },
+      { id: "mocha", name: "Мокко" },
+      { id: "tea", name: "Чай" },
+      { id: "croissant", name: "медовик" }
+    ]
+  },
+  en: {
+    brandTitle: "Sippe",
+    brandSub: "Coffee shop",
+    labels: {
+      items: "Order (choose product & qty)",
+      pickup: "Delivery",
+      time: "Time",
+      date: "Date",
+      address: "Address (for delivery)",
+      payment: "Payment",
+      name: "Name",
+      phone: "Phone *",
+      note: "Additional notes",
+      sendBtn: "📨 Send order",
+      sending: "Sending...",
+      requiredMsg: "Please fill required fields (phone and at least one item).",
+      ok_text: "✅ Order sent.",
+      error_send: "Send error: ",
+      menuTitle: "Menu",
+      priceLabel: "Price"
+    },
+    menu: [
+      { id: "espresso", name: "Espresso" },
+      { id: "americano", name: "Americano" },
+      { id: "latte", name: "Latte" },
+      { id: "cappuccino", name: "Cappuccino" },
+      { id: "flatwhite", name: "Flat White" },
+      { id: "mocha", name: "Mocha" },
+      { id: "tea", name: "Tea" },
+      { id: "croissant", name: "Croissant" }
+    ]
+  },
+  uz: {
+    brandTitle: "Sippe",
+    brandSub: "Kofe uyi",
+    labels: {
+      items: "Buyurtma (mahsulot va miqdorni tanlang)",
+      pickup: "Yetkazib berish",
+      time: "Vaqt",
+      date: "Sana",
+      address: "Manzil (yetkazib berish uchun)",
+      payment: "To'lov",
+      name: "Ism",
+      phone: "Telefon *",
+      note: "Qo'shimcha buyurtma",
+      sendBtn: "📨 Buyurtma yuborish",
+      sending: "Yuborilmoqda...",
+      requiredMsg: "Iltimos, majburiy maydonlarni to'ldiring (telefon va kamida bitta mahsulot).",
+      ok_text: "✅ Buyurtma yuborildi.",
+      error_send: "Yuborishda xato: ",
+      menuTitle: "Menyu",
+      priceLabel: "Narx"
+    },
+    menu: [
+      { id: "espresso", name: "Espresso" },
+      { id: "americano", name: "Amerikano" },
+      { id: "latte", name: "Latte" },
+      { id: "cappuccino", name: "Cappuccino" },
+      { id: "flatwhite", name: "Flat White" },
+      { id: "mocha", name: "Mocha" },
+      { id: "tea", name: "Choy" },
+      { id: "croissant", name: "medovik" }
+    ]
+  }
+};
+
+let currentLang = "uz";
+
+/* Initial editable prices (можно менять) — формат строки, отображается рядом с пунктом меню */
+const initialPrices = {
+  espresso: "20 000 so'm",
+  americano: "25 000 so'm",
+  latte: "28 000 so'm",
+  cappuccino: "30 000 so'm",
+  flatwhite: "28 000 so'm",
+  mocha: "40 000 so'm",
+  tea: "25 000 so'm",
+  Medovik: "35 000 so'm"
+};
+
+/* Utils */
+function escapeHtml(str){ if(!str) return ""; return String(str).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"','&quot;'); }
+function setStatus(text, isError=false){ const s = document.getElementById("status"); s.textContent = text || ""; s.style.color = isError ? "#ff6b6b" : "#2a8f6a"; }
+
+/* Language buttons */
+document.getElementById("btn-ru").addEventListener("click", ()=> setLanguage("ru"));
+document.getElementById("btn-en").addEventListener("click", ()=> setLanguage("en"));
+document.getElementById("btn-uz").addEventListener("click", ()=> setLanguage("uz"));
+
+function setLanguage(lang){
+  currentLang = lang;
+  applyTranslations(lang);
+  document.querySelectorAll(".lang-btn").forEach(b=>b.classList.remove("active"));
+  const el = document.getElementById("btn-"+lang); if(el) el.classList.add("active");
+  rebuildMenuItems(); // refresh item selects
+  renderMenuPanel(); // обновим меню-панель
+}
+
+function applyTranslations(lang){
+  const t = translations[lang].labels;
+  document.getElementById("brand-title").textContent = translations[lang].brandTitle;
+  document.getElementById("brand-sub").textContent = translations[lang].brandSub;
+  document.getElementById("label-items").textContent = t.items;
+  document.getElementById("label-pickup").textContent = t.pickup;
+  document.getElementById("label-time").textContent = t.time;
+  document.getElementById("label-date").textContent = t.date;
+  document.getElementById("label-address").textContent = t.address;
+  document.getElementById("label-payment").textContent = t.payment;
+  document.getElementById("label-name").textContent = t.name;
+  document.getElementById("label-phone").textContent = t.phone;
+  document.getElementById("label-note").textContent = t.note;
+  document.getElementById("sendBtnDesktop").textContent = t.sendBtn;
+  document.getElementById("mobileSendBtn").textContent = t.sendBtn;
+  // menu title
+  const mt = document.getElementById("menuTitle");
+  if(mt) mt.textContent = t.menuTitle || "Menu";
+  setStatus("");
+}
+
+/* Render menu panel (with editable prices) */
+function renderMenuPanel(){
+  const menuList = document.getElementById("menuList");
+  menuList.innerHTML = "";
+  const menu = translations[currentLang].menu;
+  const priceLabel = translations[currentLang].labels.priceLabel || "Price";
+  menu.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "menu-item";
+    const name = document.createElement("div");
+    name.className = "mname";
+    name.textContent = item.name;
+    const priceIn = document.createElement("input");
+    priceIn.className = "priceInput";
+    priceIn.value = initialPrices[item.id] || "";
+    priceIn.setAttribute("data-id", item.id);
+    priceIn.addEventListener("change", (e)=> {
+      initialPrices[item.id] = e.target.value;
+    });
+    const priceLabelEl = document.createElement("div");
+    priceLabelEl.className = "mprice";
+    priceLabelEl.appendChild(priceIn);
+    div.appendChild(name);
+    div.appendChild(priceLabelEl);
+    menuList.appendChild(div);
+  });
+}
+
+/* Dynamic items: add/remove rows */
+const itemsContainer = document.getElementById("itemsContainer");
+const addItemBtn = document.getElementById("addItemBtn");
+
+function createItemRow() {
+  const row = document.createElement("div");
+  row.className = "item-row";
+
+  const select = document.createElement("select");
+  translations[currentLang].menu.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m.id;
+    opt.textContent = m.name + (initialPrices[m.id] ? ` — ${initialPrices[m.id]}` : "");
+    select.appendChild(opt);
+  });
+
+  const size = document.createElement("select");
+  size.innerHTML = '<option value="S">S</option><option value="M" selected>M</option><option value="L">L</option>';
+  size.title = "Size";
+
+  const qty = document.createElement("input");
+  qty.type = "number";
+  qty.min = 1;
+  qty.value = 1;
+  qty.title = "Qty";
+
+  const rem = document.createElement("button");
+  rem.type = "button";
+  rem.textContent = "−";
+  rem.title = "Remove";
+  rem.addEventListener("click", ()=> { row.remove(); });
+
+  row.appendChild(select);
+  row.appendChild(size);
+  row.appendChild(qty);
+  row.appendChild(rem);
+  return row;
+}
+
+function rebuildMenuItems(){
+  // Recreate existing rows to update labels/options (simple approach)
+  const rows = Array.from(itemsContainer.querySelectorAll(".item-row"));
+  const values = rows.map(r => {
+    const s = r.querySelector("select");
+    const size = r.querySelectorAll("select")[1];
+    const qty = r.querySelector("input[type=number]");
+    return { product: s ? s.value : translations[currentLang].menu[0].id, size: size ? size.value : "M", qty: qty ? qty.value : 1 };
+  });
+  itemsContainer.innerHTML = "";
+  if(values.length === 0) {
+    itemsContainer.appendChild(createItemRow());
+  } else {
+    values.forEach(v => {
+      const r = createItemRow();
+      r.querySelectorAll("select")[0].value = v.product;
+      r.querySelectorAll("select")[1].value = v.size;
+      r.querySelector("input[type=number]").value = v.qty;
+      itemsContainer.appendChild(r);
+    });
+  }
+}
+
+/* Init items */
+addItemBtn.addEventListener("click", ()=> itemsContainer.appendChild(createItemRow()));
+window.addEventListener("DOMContentLoaded", ()=>{
+  setLanguage(currentLang);
+  itemsContainer.appendChild(createItemRow());
+  renderMenuPanel();
+  updateMobileButton();
+  window.addEventListener("resize", updateMobileButton);
+  window.addEventListener("orientationchange", updateMobileButton);
+});
+
+/* Send order */
+async function sendOrder(){
+  const t = translations[currentLang].labels;
+  const sendBtnDesktop = document.getElementById("sendBtnDesktop");
+  const mobileBtn = document.getElementById("mobileSendBtn");
+  if(sendBtnDesktop) sendBtnDesktop.disabled = true;
+  if(mobileBtn) mobileBtn.disabled = true;
+  setStatus(t.sending);
+
+  try {
+    // collect items
+    const rows = Array.from(itemsContainer.querySelectorAll(".item-row"));
+    const items = rows.map(r => {
+      const prodSel = r.querySelectorAll("select")[0];
+      const sizeSel = r.querySelectorAll("select")[1];
+      const qty = r.querySelector("input[type=number]").value || 1;
+      const prodName = translations[currentLang].menu.find(m => m.id === prodSel.value)?.name || prodSel.value;
+      const priceText = initialPrices[prodSel.value] || "";
+      return { name: prodName, id: prodSel.value, size: sizeSel.value, qty: qty, price: priceText };
+    }).filter(i => i && i.name);
+
+    const phone = document.getElementById("phone").value.trim();
+    const name = document.getElementById("customerName").value.trim() || "—";
+    const deliveryType = document.getElementById("deliveryType").value;
+    const time = document.getElementById("time").value || "—";
+    const date = document.getElementById("date").value || "—";
+    const address = document.getElementById("address").value.trim() || "—";
+    const payment = document.getElementById("payment").value;
+    const note = document.getElementById("note").value.trim() || "—";
+
+    if(!phone || items.length === 0){
+      setStatus(t.requiredMsg, true);
+      if(sendBtnDesktop) sendBtnDesktop.disabled = false;
+      if(mobileBtn) mobileBtn.disabled = false;
+      return;
+    }
+
+    // build caption
+    const header = (currentLang === "ru") ? "<b>☕ Новый заказ — Sippe</b>" : (currentLang === "en") ? "<b>☕ New order — Sippe</b>" : "<b>☕ Yangi buyurtma — Sippe</b>";
+    const lines = [header];
+    lines.push(`<b>👤 ${escapeHtml((currentLang==="ru")? "Имя": (currentLang==="en")? "Name":"Ism")}:</b> ${escapeHtml(name)}`);
+    lines.push(`<b>📱 ${escapeHtml((currentLang==="ru")? "Телефон": (currentLang==="en")? "Phone":"Telefon")}:</b> ${escapeHtml(phone)}`);
+    lines.push(`<b>🚚 ${escapeHtml((currentLang==="ru")? "Доставка": (currentLang==="en")? "Delivery":"Yetkazib berish")}:</b> ${escapeHtml(deliveryType)}`);
+    lines.push(`<b>📍 ${escapeHtml((currentLang==="ru")? "Адрес": (currentLang==="en")? "Address":"Manzil")}:</b> ${escapeHtml(address)}`);
+    lines.push(`<b>📅 ${escapeHtml((currentLang==="ru")? "Дата": (currentLang==="en")? "Date":"Sana")}:</b> ${escapeHtml(date)} <b>⏰</b> ${escapeHtml(time)}`);
+    lines.push(`<b>💳 ${escapeHtml((currentLang==="ru")? "Оплата": (currentLang==="en")? "Payment":"To'lov")}:</b> ${escapeHtml(payment)}`);
+    lines.push(`<b>📝 ${escapeHtml((currentLang==="ru")? "Заметки": (currentLang==="en")? "Notes":"Izohlar")}:</b> ${escapeHtml(note)}`);
+    lines.push(`<b>🧾 ${escapeHtml((currentLang==="ru")? "Состав заказа": (currentLang==="en")? "Order items":"Buyurtma tarkibi")}:</b>`);
+
+    items.forEach((it, idx) => {
+      lines.push(`${idx+1}. ${escapeHtml(it.name)} — ${escapeHtml(it.size)} × ${escapeHtml(it.qty)} ${it.price ? " ("+escapeHtml(it.price)+")" : ""}`);
+    });
+
+    const caption = lines.join("\n");
+
+    // send message (text)
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    const payload = { chat_id: chatId, text: caption, parse_mode: "HTML" };
+    const res = await fetch(url, { method: "POST", headers: { "Content-Type":"application/json" }, body: JSON.stringify(payload) });
+    const json = await res.json();
+    if(json.ok){
+      setStatus(t.ok_text);
+      resetForm();
+    } else {
+      setStatus(t.error_send + (json.description || "unknown"), true);
+    }
+
+  } catch(err){
+    setStatus(err.message || "Error", true);
+  } finally {
+    if(sendBtnDesktop) sendBtnDesktop.disabled = false;
+    if(mobileBtn) mobileBtn.disabled = false;
+  }
+}
+
+function resetForm(){
+  // clear inputs, reset to one item row
+  document.getElementById("customerName").value = "";
+  document.getElementById("phone").value = "";
+  document.getElementById("address").value = "";
+  document.getElementById("time").value = "";
+  document.getElementById("date").value = "";
+  document.getElementById("note").value = "";
+  document.getElementById("deliveryType").value = "pickup";
+  document.getElementById("payment").value = "cash";
+  itemsContainer.innerHTML = "";
+  itemsContainer.appendChild(createItemRow());
+}
+
+/* Mobile button visibility */
+function updateMobileButton() {
+  const mobileBtn = document.getElementById("mobileSendBtn");
+  const desktopButtons = document.querySelector(".buttons");
+  if(window.matchMedia("(max-width:820px)").matches){
+    mobileBtn.style.display = "block"; mobileBtn.setAttribute("aria-hidden","false");
+    if(desktopButtons) desktopButtons.style.display = "none";
+  } else {
+    mobileBtn.style.display = "none"; mobileBtn.setAttribute("aria-hidden","true");
+    if(desktopButtons) desktopButtons.style.display = "flex";
+  }
+}
+</script>
+</body>
+</html>
