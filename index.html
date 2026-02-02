@@ -165,10 +165,10 @@
     </div>
 
     <div class="left" aria-hidden="false">
-      <div class="logo-square" aria-hidden="true" title="Sippe">
+      <div class="logo-square" aria-hidden="true" title="Sippy">
         <!-- главный логотип (заменён на вашу ссылку) -->
         <a href="https://storage.yandexcloud.net/fotora.ru/4ce64e3562f8b3e6.jpeg" target="_blank" rel="noopener noreferrer">
-          <img src="https://storage.yandexcloud.net/fotora.ru/4ce64e3562f8b3e6.jpeg" alt="Sippe logo">
+          <img src="https://storage.yandexcloud.net/fotora.ru/4ce64e3562f8b3e6.jpeg" alt="Sippy logo">
         </a>
         <!-- небольшие бейджи/иконки рядом с логотипом -->
       </div>
@@ -183,7 +183,7 @@
       </div>
 
       <div style="flex:1;">
-        <h2 id="brand-title">Sippe</h2>
+        <h2 id="brand-title">Sippy</h2>
         <div class="subtitle" id="brand-sub">Kofe uyi</div>
       </div>
     </div>
@@ -270,7 +270,7 @@ const chatId = "-1003679635799";
 /* Translations + menu items */
 const translations = {
   ru: {
-    brandTitle: "Sippe",
+    brandTitle: "Sippy",
     brandSub: "Кофейня",
     labels: {
       items: "Заказ (выберите продукт и количество)",
@@ -302,7 +302,7 @@ const translations = {
     ]
   },
   en: {
-    brandTitle: "Sippe",
+    brandTitle: "Sippy",
     brandSub: "Coffee shop",
     labels: {
       items: "Order (choose product & qty)",
@@ -334,7 +334,7 @@ const translations = {
     ]
   },
   uz: {
-    brandTitle: "Sippe",
+    brandTitle: "Sippy",
     brandSub: "Kofe uyi",
     labels: {
       items: "Buyurtma (mahsulot va miqdorni tanlang)",
@@ -559,7 +559,7 @@ async function sendOrder(){
     }
 
     // build caption
-    const header = (currentLang === "ru") ? "<b>☕ Новый заказ — Sippe</b>" : (currentLang === "en") ? "<b>☕ New order — Sippe</b>" : "<b>☕ Yangi buyurtma — Sippe</b>";
+    const header = (currentLang === "ru") ? "<b>☕ Новый заказ — Sippy</b>" : (currentLang === "en") ? "<b>☕ New order — Sippy</b>" : "<b>☕ Yangi buyurtma — Sippy</b>";
     const lines = [header];
     lines.push(`<b>👤 ${escapeHtml((currentLang==="ru")? "Имя": (currentLang==="en")? "Name":"Ism")}:</b> ${escapeHtml(name)}`);
     lines.push(`<b>📱 ${escapeHtml((currentLang==="ru")? "Телефон": (currentLang==="en")? "Phone":"Telefon")}:</b> ${escapeHtml(phone)}`);
